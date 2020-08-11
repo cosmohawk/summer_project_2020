@@ -6,33 +6,7 @@ import pandas as pd
 
 import tweepy
 
-def connect_API(keys_file):
-    '''
-    Load twitter API credentials and return a tweepy API instance with which to
-    make API calls.
-
-    Params
-    ------
-    keys_file : str
-        The path to a `*.json` file containing the twitter API credentials to
-        be used.  See the notebook `store_twitter_credentials_as_json.ipynb`
-        for more.
-        
-    Returns
-    -------
-    api : tweepy API object
-    '''
-    with open(keys_file, 'r') as file:
-        creds = json.load(file)
-
-    # Use credentials to set up API access authorisation
-    auth = tweepy.OAuthHandler(creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'])
-    auth.set_access_token(creds['ACCESS_TOKEN'], creds['ACCESS_SECRET'])
-    api = tweepy.API(auth, wait_on_rate_limit=True)
-    
-    return api
-
-def request_user_info(api, screen_name=None, user_id=None):
+def request_user_info(api, screen_name=None, user_id=None, api_delay=True):
     '''
     Request user info from the twitter API using the `get_user` method based
     on either the user's twitter handle or ID number.  
@@ -47,22 +21,52 @@ def request_user_info(api, screen_name=None, user_id=None):
     user_id : int
         ID number of user to request information about. One of `screen_name` 
         or `user_id` must be provided.
+    api_delay : bool
+        If true, add a sleep delay to pace API requests within rate limits.
+        Rate limit info for user profile requests is 900/15 mins
 
     Returns
     -------
-    user_info : tweepy.models.User object
-        A tweepy object where user information is stored as attributes.
+    user_info : dict
+        A python dict where user information is stored under named keys.
     '''
-    if screen_name not None:
+    # Go through and check whether ID or name has been provided
+    if screen_name not None: 
         search = {'screen_name': screen_name}
     elif: user_id not None:
         search = {'user_id': user_id}
     else:
         Exception('No user name or ID was provided.')
     
-    user = api.get_user(**search)
+    user = api.get_user(**search) # API call to get user info
+    if api_delay:
+        time.sleep(1)
 
-    return user
+    # Convert tweepy user object into dict that can be stored as json
+    user_info = vars(user) 
+
+    # eject keys which certainly provide no additional info
+    for key in ['_api', '_json']: 
+        user_info.pop(key)
+
+    return user_info
+
+def batch_pull_user_info(api, users_list, kwargs):
+    '''
+    Get user info for a set of users.  
+
+    '''
+    users_data = {}
+
+    for user in users_list:
+        users_data[user] = request_user_info(api, )
+
+    return users_data
+
+def save_user_info_to_json(user_data, filename):
+    '''
+
+    '''
 
 def tweepy_user_to_dataframe(user):
     '''
@@ -78,6 +82,13 @@ def tweepy_user_to_dataframe(user):
     -------
     user_df : DataFrame object
         A Pandas dataframe with one row and columns for each attribute.
+
+    TODO:
+    -----
+    -Rework this function, and maybe move it completely, to work with dicts/
+    json format
+    -Abstract the selection of important attributes to the user level and 
+    improve interactivity/customisation.
     '''
     user_dict = vars(user) # First discriminate the attributes of the object
     # from it's methods. Then 'pop' to remove potentially problematic attrs.
@@ -90,8 +101,3 @@ def tweepy_user_to_dataframe(user):
 
     return user_df
 
-def merge_user_dataframes():
-    '''
-
-    '''
-    
