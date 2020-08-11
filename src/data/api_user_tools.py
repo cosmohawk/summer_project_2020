@@ -89,3 +89,9 @@ def tweepy_user_to_dataframe(user):
     user_df = pd.DataFrame(user_dict, index=0)
 
     return user_df
+
+def merge_user_dataframes():
+    '''
+
+    '''
+    
