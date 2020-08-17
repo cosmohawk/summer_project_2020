@@ -21,7 +21,7 @@ def twint_mentions_to_df(twint_df):
     temp_ids = twint_df['id'].values
     temp_mentions = twint_df['mentions'].values
     for i in range(len(temp_ids)):
-        temp_list = list(temp_mentions[i].strip('][').split(', '))
+        temp_list = list(temp_mentions[i].strip('][').replace("'","").split(', '))
         for mention in temp_list:
             if len(mention)>0:
                 mentions.append([temp_ids[i], mention])
