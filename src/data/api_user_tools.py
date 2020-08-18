@@ -31,9 +31,9 @@ def request_user_info(api, screen_name=None, user_id=None, api_delay=True):
         A python dict where user information is stored under named keys.
     '''
     # Go through and check whether ID or name has been provided
-    if screen_name not None: 
+    if screen_name is not None: 
         search = {'screen_name': screen_name}
-    elif: user_id not None:
+    elif user_id is not None:
         search = {'user_id': user_id}
     else:
         Exception('No user name or ID was provided.')
@@ -62,11 +62,6 @@ def batch_pull_user_info(api, users_list, kwargs):
         users_data[user] = request_user_info(api, )
 
     return users_data
-
-def save_user_info_to_json(user_data, filename):
-    '''
-
-    '''
 
 def tweepy_user_to_dataframe(user):
     '''
@@ -101,3 +96,29 @@ def tweepy_user_to_dataframe(user):
 
     return user_df
 
+def query_user_relationship(api, userA, userB):
+    '''
+    Asks the twitter API if user X follows user Y, and vice versa.
+
+    Params
+    ------
+    api : tweepy API instance
+        The API object to be used to make the request.
+    userA : str
+        the first username to check friendship status of
+    userB : str
+        the second username to check friendship status with A
+
+    Returns
+    -------
+    statuses : dict
+        contains whether A follows B, and whether B follows A.
+    '''
+    statusA, statusB = api.show_friendship(source_screen_name=userA, target_screen_name=userB)
+
+    statuses = {'userA' : userA,
+                'userB' : userB,
+                'AfollowsB' : statusA.following,
+                'BfollowsA' : statusB.following}
+    
+    return statuses
