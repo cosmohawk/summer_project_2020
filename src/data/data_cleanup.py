@@ -115,3 +115,37 @@ def fill_standard_tweet_dataset_with_API(standard_df, API_df):
     standard_df['hashtags'] = standard_df['hashtags'].str.lower()   
     
     return standard_df
+
+def populate_user_df(user_data):
+    '''
+    Take a series of tweepy user objects and transform them into a dataframe.
+    
+    Params
+    ------
+    user_data : list
+        List of tweepy.User objects 
+    
+    Returns
+    -------
+    user_df : Pandas DataFrame
+        Cleaned dataframe with user data.
+    '''
+    df_fields = ['user_id', 'screen_name',  'name', 'location', 'user_description', 
+              'user_friends_n', 'user_followers_n', 'prof_created_at', 'favourites_count', 
+              'verified', 'statuses_count']
+    
+    API_fields = ['id', 'screen_name', 'name', 'location', 'description', 
+                  'friends_count', 'followers_count', 'created_at', 'favourites_count',
+                 'verified', 'statuses_count']
+    # Go through tweepy user objects and pull relevant data into lists
+    full_list = []
+    for user in user_data:
+        user_vars = vars(user)
+        data_list = [user_vars[field] for field in API_fields]
+        full_list.append(data_list)
+    # Translate data list into dataframe
+    user_df = pd.DataFrame(full_list, columns=df_fields)
+    # Additional cleaning of data in dataframe
+    user_df['screen_name'] = user_df['screen_name'].str.lower()
+    
+    return user_df
