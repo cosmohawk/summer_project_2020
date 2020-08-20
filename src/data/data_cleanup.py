@@ -143,7 +143,7 @@ def fill_standard_tweet_dataset_with_API(standard_df, API_df):
     standard_df['text'] = API_df['text']
     # Replies - RT - likes count
     standard_df['retweets_count'] = API_df['retweet_count']
-    standard_df['likes_count'] = API_df['favourite_count'] # check that likes and favourite are the same thing!!!!
+    standard_df['likes_count'] = API_df['favorite_count'] # check that likes and favourite are the same thing!!!!
     #Hashtags
     standard_df['hashtags'] = API_df['hashtags']
     # RT text
