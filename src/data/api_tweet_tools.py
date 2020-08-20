@@ -5,7 +5,7 @@ import datetime
 import pandas as pd
 import tweepy
 
-def request_user_timeline(api, user, api_delay=True, kwargs=None):
+def request_user_timeline(api, user, api_delay=0.15, kwargs=None):
     '''
     Function to make a single API request from a user's timeline.
     If no keywords are provided, the request will return tweepy defaults, which
@@ -18,8 +18,9 @@ def request_user_timeline(api, user, api_delay=True, kwargs=None):
     user : str or int
         Either the screen-name or user-ID for the user whose timeline is being
         requested.
-    api_delay : bool
-        If true, adds sleep() delay after command to avoid hitting rate limit. 
+    api_delay : float
+         Value represents the delay in seconds added after each API request.
+         Is used to pad the processing time to keep within the API rate limits.
     kwargs : dict or None
         A dictionary containing keyword arguments to be passed to the api method.
     
@@ -46,10 +47,11 @@ def request_user_timeline(api, user, api_delay=True, kwargs=None):
         Exception('API request threw an error, returned object could be empty.')
         tweets = []
     
-    if api_delay:
-        time.sleep(1) # Allowed to make 900 requests per 15 minutes, or 1 per second
+    if api_delay>0:
+        time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
     
-    TL_tweets.extend([item for item in tweets]) # parse tweets from object into list
+    for tweet in tweets:
+        TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list
 
     return TL_tweets
 
