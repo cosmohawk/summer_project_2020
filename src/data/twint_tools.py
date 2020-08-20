@@ -11,6 +11,8 @@ import nest_asyncio
 nest_asyncio.apply()
 import twint
 
+import pandas as pd
+
 def _get_friends(q, fp, n_retries=1, suppress=True):
     '''
     Within a threaded queue, use twint to scrape the names of users followed
@@ -163,3 +165,50 @@ def twint_in_queue(target, num_threads, queue_items, args=(), kwargs={}):
         q.put(item)
 
     q.join()
+
+#####################################################################################
+
+def join_tweet_csv(list, keyword):
+    '''
+    Params
+    ------    
+    '''
+    all_handles = []
+    all_users = []
+    failed = []
+    all_tweets = pd.DataFrame()
+    for name in list:
+        filepath = '../data/raw/'+keyword +'_'+'tweets' +'_'+name+'.csv'
+        if os.path.exists(filepath):
+            all_handles.append(filepath)
+            temp_csv = pd.read_csv(filepath)
+            all_tweets = pd.concat([all_tweets, temp_csv])
+    return all_tweets
+
+######################################################################################
+
+def join_friends_csv(list_journalists,keyword):
+    all_handles = []
+    all_users = []
+    failed = []
+    for name in list_journalists:
+        filepath = '../data/raw/'+keyword+'_friends_'+name+'.csv'
+        if not os.path.exists(filepath):
+            failed.append(name)
+        else:
+            with open(filepath, newline='') as f:
+                reader = csv.reader(f)
+                handles = list(reader)
+                all_handles.extend([handle[0] for handle in handles])
+                all_users.extend([name for handle in handles])
+                print('@'+name+' follows '+str(len(handles))+' users.')
+
+    print('\nTotal number of handles pulled: '+str(len(all_handles)))
+
+    unique = len(set(all_handles))
+    print('Number of unique twitter handles: '+str(unique))
+
+    print('\nZero following in list for users: '+str(failed))
+    df = pd.DataFrame(list(zip(all_users, all_handles)), 
+                   columns =['screen_name', 'friend'])
+    return df
