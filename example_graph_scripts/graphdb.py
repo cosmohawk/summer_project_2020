@@ -15,7 +15,7 @@ def get_graph(new_graph=True):
 
     return graph
 
-def load_tweets(filename, graph):
+def load_tweets_and_users(filename, graph):
     # function to load tweet information contained in a csv file into the graph database
     # inputs: filename - name of file containing tweet information
     # outputs: none
@@ -30,6 +30,43 @@ def load_tweets(filename, graph):
        retweets_count: row.reteets_count, favourite_count: row.favourite_count, likes_count: row.likes_count,
        hashtags: row.hashtags, topics: row.topics})
    
+       MERGE (p:Person {user_id: row.user_id, screen_name: toLower(row.screen_name), name: row.name, 
+        user_description: row.user_description, user_friends_n: row.user_friends_n, user_followers_n: row.user_followers_n, 
+       prof_created_at: row.prof_created_at, favourites_count: row.favourites_count, verified: row.verified, 
+       statuses_count: row.statuses_count});
+       '''
+    # run cypher query
+    graph.run(query_string)
+    return
+
+def load_tweets(filename, graph):
+    # function to load tweet information contained in a csv file into the graph database
+    # inputs: filename - name of file containing tweet information
+    # outputs: none
+
+    # load in tweets and twitter user information
+    query_string = '''
+       LOAD CSV WITH HEADERS FROM "file:///'''+filename+'''" AS row
+   
+       CREATE (t:Tweet {tweet_id: row.tweet_id, conversation_id: row.conversation_id, user_id: row.user_id, 
+       reply_to: row.reply_to, tweet_created_at_date: row.tweet_created_at_date, 
+       tweet_created_at_time: row.tweet_created_at_time, text: row.text, replies_count: row.replies_count, 
+       retweets_count: row.reteets_count, favourite_count: row.favourite_count, likes_count: row.likes_count,
+       hashtags: row.hashtags, topics: row.topics});
+       '''
+    # run cypher query
+    graph.run(query_string)
+    return
+
+
+def load_users(filename, graph):
+    # function to load tweet information contained in a csv file into the graph database
+    # inputs: filename - name of file containing user information
+    # outputs: none 
+   
+    # load in twitter user information
+    query_string = '''
+       LOAD CSV WITH HEADERS FROM "file:///'''+filename+'''" AS row
        MERGE (p:Person {user_id: row.user_id, screen_name: toLower(row.screen_name), name: row.name, 
         user_description: row.user_description, user_friends_n: row.user_friends_n, user_followers_n: row.user_followers_n, 
        prof_created_at: row.prof_created_at, favourites_count: row.favourites_count, verified: row.verified, 
@@ -107,12 +144,12 @@ def run_pagerank(nodelist,edgelist,graph,new_native_graph=True):
                 CALL gds.pageRank.stream('my-graph') 
                 YIELD nodeId, score
                 WHERE EXISTS(gds.util.asNode(nodeId).screen_name)
-                RETURN gds.util.asNode(nodeId).screen_name AS screen_name, score
-                ORDER BY score DESC, screen_name ASC'''##//''' LIMIT 100'''
+                RETURN gds.util.asNode(nodeId).screen_name AS screen_name, score, gds.util.asNode(nodeId).user_followers_n AS user_followers_n
+                ORDER BY score DESC, user_followers_n ASC, screen_name ASC'''##//''' LIMIT 100'''
     ans = graph.run(query_string)
     
     # put result into a dataframe
-    df = pd.DataFrame.from_records(ans, columns=['screen name', 'rank'])
+    df = pd.DataFrame.from_records(ans, columns=['screen name', 'rank', 'n_followers'])
     
     return df.copy()
 
@@ -137,3 +174,24 @@ def get_weighted_sample(ranked_df,sample_size,field,weight_exponent):
 
     return sample_df
 
+def get_multiple_weighted_sample(ranked_df,sample_size,fields,weight_exponents):  
+
+    weights = []
+    for i in range(len(fields)):
+        field = fields[i]
+        ranked_df[field] = [float(n) for n in ranked_df[field]]
+        exponent = weight_exponents[i]
+        sum_of_ranks = np.sum(ranked_df[field]**exponent)
+        weight = ranked_df[field]**exponent/sum_of_ranks
+        weights.append(weight)
+
+    weights = np.prod(weights,axis=0)/np.sum(np.prod(weights,axis=0))
+    sample = np.random.choice(ranked_df['screen name'],size=sample_size,
+                                    replace=False,p=weights)
+     
+    lst = []
+    for s in sample:
+        index  = ranked_df.index[ranked_df['screen name'] == s].tolist()
+        lst.append(index[0])
+    sample_df = ranked_df.loc[lst].copy()
+    return sample_df
