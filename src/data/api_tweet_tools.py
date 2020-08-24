@@ -1,7 +1,7 @@
 import sys
 import time
 import datetime
-import tqdm
+from tqdm import tqdm
 
 import pandas as pd
 import tweepy
@@ -67,7 +67,7 @@ def wrangle_tweets_into_df(tweet_list):
         ents_data.append(tweet.pop('entities'))
     # Create temporary dataframes
     tmp_tweet_df = pd.DataFrame(tweet_list)
-    rt_data = [vars(retweet) if hasattr(retweet, __dict__) else {} for retweet in list(tmp_tweet_df['retweeted_status'.values])]
+    rt_data = [vars(retweet) if hasattr(retweet, '__dict__') else {} for retweet in list(tmp_tweet_df['retweeted_status'].values)]
     tmp_user_df = pd.DataFrame(user_data)
     tmp_ents_df = pd.DataFrame(ents_data)
     tmp_rt_df = pd.DataFrame(rt_data)
@@ -92,7 +92,7 @@ def wrangle_tweets_into_df(tweet_list):
 
     return tweet_df
 
-def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs={'count':200}):
+def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs={'tweet_mode':'extended', 'count':200}):
     '''
     Function to sample the most recent tweets (up to 200) from the timelines of a
     list of users.  
@@ -110,6 +110,8 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs
     kwargs : dict
         The keyword arguments to be passed to `request_user_timeline()`
         See that function for details.
+
+    TODO: Hard-code the tweet_mode kwarg, code breaks without it, also hard-code default count as 200
     '''
     N = len(user_list)
 
@@ -123,7 +125,7 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs
                     tweet.pop('author')
                 tweets.extend(results)
                 pbar.update(1)
-            tweet_df = wrangle_tweets_into_df()
+            tweet_df = wrangle_tweets_into_df(tweets)
             full_path = filepath + 'user_timelines_subset_' + str(j) + '.csv'
             tweet_df.to_csv(full_path, index=False)
             j += 1
