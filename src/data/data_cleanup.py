@@ -95,8 +95,8 @@ def clean_twint_dataframe(twint_df):
     '''
     standard_df = init_cleaned_tweet_df() # Initialise an empty dataframe
     # Start assigning the columns
+    standard_df = pd.concat([standard_df, twint_df[twint_df.columns.intersection(standard_df.columns)]], axis=0)
     
-        
 
     #tweet and conversation ID
     standard_df['tweet_id'] = twint_df['id']
@@ -192,5 +192,6 @@ def populate_user_df(user_data):
     user_df = pd.DataFrame(full_list, columns=df_fields)
     # Additional cleaning of data in dataframe
     user_df['screen_name'] = user_df['screen_name'].str.lower()
+    standard_df['user_description'] = standard_df['user_description'].apply(lambda text : clean_text(text) if isinstance(text, str) else 'None')
     
     return user_df
