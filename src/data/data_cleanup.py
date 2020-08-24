@@ -97,6 +97,7 @@ def clean_twint_dataframe(twint_df):
     # Merge columns with matching names
     standard_df = pd.concat([standard_df, twint_df[twint_df.columns.intersection(standard_df.columns)]], axis=0)
     # Clone columns with name mismatches
+    standard_df['tweet_id'] = twint_df['id'] # tweet id
     standard_df['screen_name'] = twint_df['username'] # user twitter handle
     standard_df['tweet_created_at'] = twint_df['date'] + ' ' + twint_df['time'] # datetime of tweet creation
     standard_df['text'] = twint_df['tweet'] # the tweet contents
