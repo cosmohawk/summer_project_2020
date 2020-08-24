@@ -102,10 +102,11 @@ def clean_twint_dataframe(twint_df):
     standard_df['text'] = twint_df['tweet'] # the tweet contents
     standard_df['retweet_count'] = twint_df['retweets_count']
     standard_df['like_count'] = twint_df['likes_count']
-    
+    # Clean up fields that need cleaning
     standard_df['reply_to'] = standard_df['reply_to'].apply(lambda x : [user['username'] for user in eval(x)]) # convert reply_to into list of screen_names
-    standard_df['hashtags'] = standard_df['hashtags'].apply(lambda x : re.sub(r'\#','',x))
-    # Check that the columns that contain strings have all lowercases
+    standard_df['hashtags'] = standard_df['hashtags'].apply(lambda x : re.sub(r'\#','',x)) # remove hash symbol from hashtags list
+    standard_df['quoted_status_id'] = twint_df['quote_url'].apply(lambda x : int(x.split('/')[-1]) if isinstance(x, str) else None) # get id of quoted tweet from url
+    # Regularise some columns to lowercase
     standard_df['reply_to'] = standard_df['reply_to'].str.lower()
     standard_df['screen_name'] = standard_df['screen_name'].str.lower()
     standard_df['hashtags'] = standard_df['hashtags'].str.lower()
