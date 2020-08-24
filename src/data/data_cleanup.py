@@ -94,31 +94,17 @@ def clean_twint_dataframe(twint_df):
         A dataframe containing tweets with a standardised set of fields.
     '''
     standard_df = init_cleaned_tweet_df() # Initialise an empty dataframe
-    # Start assigning the columns
+    # Merge columns with matching names
     standard_df = pd.concat([standard_df, twint_df[twint_df.columns.intersection(standard_df.columns)]], axis=0)
+    # Clone columns with name mismatches
+    standard_df['screen_name'] = twint_df['username'] # user twitter handle
+    standard_df['tweet_created_at'] = twint_df['date'] + ' ' + twint_df['time'] # datetime of tweet creation
+    standard_df['text'] = twint_df['tweet'] # the tweet contents
+    standard_df['retweet_count'] = twint_df['retweets_count']
+    standard_df['like_count'] = twint_df['likes_count']
     
-
-    #tweet and conversation ID
-    standard_df['tweet_id'] = twint_df['id']
-    #conversation ID (twint) or in_reply_to_status_id (API)
-    standard_df['conversation_id'] = twint_df['conversation_id']
-    #reply to or reply to status_id
-    standard_df['reply_to'] = twint_df['reply_to']
-    #user id and it's screen_name
-    standard_df['user_id'] = twint_df['user_id']
-    standard_df['screen_name'] = twint_df['username']
-    #date of tweet
-    standard_df['tweet_created_at'] = twint_df['date'] + ' ' + twint_df['time']
-    #Tweet text
-    standard_df['text'] = twint_df['tweet']
-    # Replies - RT - likes count
-    standard_df['replies_count'] = twint_df['replies_count']
-    standard_df['retweets_count'] = twint_df['retweets_count']
-    standard_df['likes_count'] = twint_df['likes_count']
-    #Hashtags
-    standard_df['hashtags'] = twint_df['hashtags']
-    
-    
+    standard_df['reply_to'] = standard_df['reply_to'].apply(lambda x : [user['username'] for user in eval(x)]) # convert reply_to into list of screen_names
+    standard_df['hashtags'] = standard_df['hashtags'].apply(lambda x : re.sub(r'\#','',x))
     # Check that the columns that contain strings have all lowercases
     standard_df['reply_to'] = standard_df['reply_to'].str.lower()
     standard_df['screen_name'] = standard_df['screen_name'].str.lower()
@@ -192,6 +178,6 @@ def populate_user_df(user_data):
     user_df = pd.DataFrame(full_list, columns=df_fields)
     # Additional cleaning of data in dataframe
     user_df['screen_name'] = user_df['screen_name'].str.lower()
-    standard_df['user_description'] = standard_df['user_description'].apply(lambda text : clean_text(text) if isinstance(text, str) else 'None')
+    user_df['user_description'] = user_df['user_description'].apply(lambda text : clean_text(text) if isinstance(text, str) else 'None')
     
     return user_df
