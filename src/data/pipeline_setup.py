@@ -13,7 +13,7 @@ def build_data_dir(fp):
     dirs = [os.path.join(fp, 'data/'),] # Initialise list of directories with the root of the data directory structure
     dirs.append(os.path.join(dirs[0], 'raw/')) # append data directory sub-folders to list of dirs to check/create
     dirs.append(os.path.join(dirs[0], 'processed/')) 
-    dirs.appen(os.path.join(dirs[0], 'outputs/'))
+    dirs.append(os.path.join(dirs[0], 'outputs/'))
     
     exists = [os.path.isdir(folder) for folder in dirs] # create list of checks whether directories exist
     
