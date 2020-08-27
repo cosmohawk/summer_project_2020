@@ -168,7 +168,7 @@ def twint_in_queue(target, num_threads, queue_items, args=(), kwargs={}):
 
 #####################################################################################
 
-def join_tweet_csv(list, keyword):
+def join_tweet_csv(user_list, keyword):
     '''
     Params
     ------    
@@ -177,7 +177,7 @@ def join_tweet_csv(list, keyword):
     all_users = []
     failed = []
     all_tweets = pd.DataFrame()
-    for name in list:
+    for name in user_list:
         filepath = '../data/raw/'+keyword +'_'+'tweets' +'_'+name+'.csv'
         if os.path.exists(filepath):
             all_handles.append(filepath)
