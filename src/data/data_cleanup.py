@@ -44,6 +44,7 @@ def twint_mentions_to_df(twint_df):
     mentions = []
     temp_ids = twint_df['id'].values
     temp_mentions = twint_df['mentions'].values
+    type(temp_mentions)
     for i in range(len(temp_ids)):
         temp_list = list(temp_mentions[i].strip('][').replace("'","").split(', '))
         for mention in temp_list:
@@ -52,6 +53,55 @@ def twint_mentions_to_df(twint_df):
             
     tweet_mentions = pd.DataFrame(mentions, columns=['tweet_id', 'mentions'])
     return tweet_mentions
+
+############################################################################################################################
+def mentions_to_df(df):
+    '''
+    Function to search through twint tweet data for user mentions
+    and return a dataframe containing a tweet id and mentioned username
+    in each row.
+    
+    Params
+    ------
+    twint_df : Pandas DataFrame
+
+    Returns
+    -------
+    tweet_mentions : Pandas DataFrame
+    '''    
+    
+    mentions = []
+    # if dataset == 'twint':
+    #     temp_ids = df['id'].values
+    # elif dataset == 'api':
+    #     temp_ids = df['tweet_id'].values
+
+    if hasattr(df, 'tweet_id'):
+        temp_ids = df['tweet_id'].values
+    elif hasattr(df, 'id'):
+        temp_ids = df['id'].values
+    else:
+        print('What did you give me???')
+
+    temp_mentions = df['mentions'].values
+    
+    for i in range(len(temp_ids)):
+        #temp_list = list(temp_mentions[i].strip('][').replace("'","").split(', '))
+        if isinstance(temp_mentions[i], str):
+            temp_list = eval(temp_mentions[i])
+        elif isinstance(temp_mentions[i], list):
+            temp_list = temp_mentions[i]
+        #temp_mentions = list(temp_mentions)
+        #temp_list = [item.strip('[]').replace("'","").split(', ') for item in temp_mentions]
+        
+        for mention in temp_list:
+            if len(mention)>0:
+                mentions.append([temp_ids[i], mention])
+                
+    tweet_mentions = pd.DataFrame(mentions, columns=['tweet_id', 'mentions'])
+    return tweet_mentions
+    
+    
 
 ############################################################################################################################
 
@@ -97,16 +147,19 @@ def clean_twint_dataframe(twint_df):
     # Merge columns with matching names
     standard_df = pd.concat([standard_df, twint_df[twint_df.columns.intersection(standard_df.columns)]], axis=0)
     # Clone columns with name mismatches
+    standard_df['tweet_id'] = twint_df['id'] # tweet id
     standard_df['screen_name'] = twint_df['username'] # user twitter handle
     standard_df['tweet_created_at'] = twint_df['date'] + ' ' + twint_df['time'] # datetime of tweet creation
     standard_df['text'] = twint_df['tweet'] # the tweet contents
     standard_df['retweet_count'] = twint_df['retweets_count']
     standard_df['like_count'] = twint_df['likes_count']
-    
-    standard_df['reply_to'] = standard_df['reply_to'].apply(lambda x : [user['username'] for user in eval(x)]) # convert reply_to into list of screen_names
-    standard_df['hashtags'] = standard_df['hashtags'].apply(lambda x : re.sub(r'\#','',x))
-    # Check that the columns that contain strings have all lowercases
-    standard_df['reply_to'] = standard_df['reply_to'].str.lower()
+    # Clean up fields that need cleaning
+    standard_df['in_reply_to_user_id'] = twint_df['reply_to'].apply(lambda x : [user['user_id'] for user in eval(x)]) # convert reply_to into list of screen_names
+    standard_df['in_reply_to_screen_name'] = twint_df['reply_to'].apply(lambda x : [user['username'] for user in eval(x)])
+    standard_df['hashtags'] = standard_df['hashtags'].apply(lambda x : re.sub(r'\#','',x)) # remove hash symbol from hashtags list
+    standard_df['quoted_status_id'] = twint_df['quote_url'].apply(lambda x : int(x.split('/')[-1]) if isinstance(x, str) else None) # get id of quoted tweet from url
+    # Regularise some columns to lowercase
+    standard_df['in_reply_to_screen_name'] = standard_df['in_reply_to_screen_name'].str.lower()
     standard_df['screen_name'] = standard_df['screen_name'].str.lower()
     standard_df['hashtags'] = standard_df['hashtags'].str.lower()
     

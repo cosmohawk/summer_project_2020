@@ -168,7 +168,7 @@ def twint_in_queue(target, num_threads, queue_items, args=(), kwargs={}):
 
 #####################################################################################
 
-def join_tweet_csv(list, keyword):
+def join_tweet_csv(user_list, keyword):
     '''
     Params
     ------    
@@ -177,7 +177,7 @@ def join_tweet_csv(list, keyword):
     all_users = []
     failed = []
     all_tweets = pd.DataFrame()
-    for name in list:
+    for name in user_list:
         filepath = '../data/raw/'+keyword +'_'+'tweets' +'_'+name+'.csv'
         if os.path.exists(filepath):
             all_handles.append(filepath)
@@ -198,6 +198,7 @@ def join_friends_csv(list_journalists,keyword):
         else:
             with open(filepath, newline='') as f:
                 reader = csv.reader(f)
+                next(reader, None) # trying to fix the bug
                 handles = list(reader)
                 all_handles.extend([handle[0] for handle in handles])
                 all_users.extend([name for handle in handles])
