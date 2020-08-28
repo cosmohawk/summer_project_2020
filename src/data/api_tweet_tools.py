@@ -1,7 +1,7 @@
 import sys
 import time
 import datetime
-from tqdm.auto import tqdm
+from tqdm import tqdm
 
 import math
 import pandas as pd
