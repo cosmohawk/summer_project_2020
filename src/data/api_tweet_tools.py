@@ -38,6 +38,8 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     '''    
     TL_tweets = []
 
+    count = n_tweets if n_tweets < 200 else 200
+
     # Make tweepy cursor to iterate through requests
     n_requests = math.ceil(n_tweets/200)
     if n_requests > 16: # 16 comes from 3200 max tweets / 200 max tweets per request
@@ -49,7 +51,7 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     response=True
     while page<n_requests and response:
         try:
-            request = api.user_timeline(user, count=200,  tweet_mode='extended', page=page) 
+            request = api.user_timeline(user, count=count,  tweet_mode='extended', page=page) 
             # NOTE: count is hardcoded to give up to the maximum number of tweets per request
             if request:
                 for tweet in request:
