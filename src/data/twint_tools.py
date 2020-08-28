@@ -21,8 +21,8 @@ def _get_friends(q, fp, n_retries=1, suppress=True):
     NOTE: This function has to be called from within another process, as it is
     intended to be the target of a Thread object. See function `twint_in_queue`
 
-    Params
-    ------
+    Parameters
+    ----------
     q : a Queue object instance
         A reference to the queue object that this threaded function will interact with
     fp : string
@@ -77,8 +77,8 @@ def _search_tweets_by_user(q, fp, date_range=(None,None), n_retries=1, suppress=
     NOTE: This function has to be called from within another process, as it is
     intended to be the target of a Thread object. See function `twint_in_queue`
 
-    Params
-    ------
+    Parameters
+    ----------
     q : a Queue object instance
         A reference to the queue object that this threaded function will interact with
     fp : string
@@ -140,8 +140,8 @@ def twint_in_queue(target, num_threads, queue_items, args=(), kwargs={}):
     '''
     Function for executing twint requests in threads.
 
-    Params
-    ------
+    Parameters
+    ----------
     target : func
         The function each thread will be executing.
     num_threads : int
@@ -170,8 +170,8 @@ def twint_in_queue(target, num_threads, queue_items, args=(), kwargs={}):
 
 def join_tweet_csv(user_list, keyword):
     '''
-    Params
-    ------    
+    Parameters
+    ---------- 
     '''
     all_handles = []
     all_users = []
