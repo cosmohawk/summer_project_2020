@@ -13,6 +13,7 @@ Welcome to Aug20Ditchley's documentation!
    setup
    pipeline
    contributors
+   docs
    
 
 .. toctree::
