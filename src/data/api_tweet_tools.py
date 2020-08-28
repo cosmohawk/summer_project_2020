@@ -1,12 +1,13 @@
 import sys
 import time
 import datetime
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
+import math
 import pandas as pd
 import tweepy
 
-def request_user_timeline(api, user, api_delay=0, kwargs=None):
+def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     '''
     Function to make a single API request from a user's timeline.
     If no keywords are provided, the request will return tweepy defaults, which
@@ -22,8 +23,8 @@ def request_user_timeline(api, user, api_delay=0, kwargs=None):
     api_delay : float
          Value represents the delay in seconds added after each API request.
          Is used to pad the processing time to keep within the API rate limits.
-    kwargs : dict or None
-        A dictionary containing keyword arguments to be passed to the api method.
+    n_tweets : int
+        The number of tweets to be retrieved from a user's timeline.  Max is 3200.
     
     Returns
     -------
@@ -34,31 +35,50 @@ def request_user_timeline(api, user, api_delay=0, kwargs=None):
     - Check if try/except gets stuck if the api throws an error. I think with
     current code iterating through the timeline would result in trying the same
     request over and over again. 
-    '''
-    if kwargs is None:
-        # If None, turn kwargs into empty dict so code doesn't break when no
-        # extra arguments are needed
-        kwargs = {}
-    
+    '''    
     TL_tweets = []
 
-    try:
-        tweets = api.user_timeline(user, **kwargs)
-    except:
-        Exception('API request threw an error, returned object could be empty.')
-        tweets = []
-    
-    if api_delay>0:
-        time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
-    
-    for tweet in tweets:
-        TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list
+    # Make tweepy cursor to iterate through requests
+    n_requests = math.ceil(n_tweets/200)
+    if n_requests > 16: # 16 comes from 3200 max tweets / 200 max tweets per request
+        print('Requested number of tweets too high.  Limited to 3200 per user.')
+        print('Continuing with n_tweets = 3200')
+        n_requests = 16
+
+    page = 0
+    response=True
+    while page<n_requests and response:
+        try:
+            request = api.user_timeline(user, count=200,  tweet_mode='extended', page=page) 
+            # NOTE: count is hardcoded to give up to the maximum number of tweets per request
+            if request:
+                for tweet in request:
+                    TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
+
+                if api_delay>0:
+                    time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
+            else:
+                response = False
+            page += 1
+        except Exception as x:
+            print(x)
 
     return TL_tweets
 
 def wrangle_tweets_into_df(tweet_list):
     '''
+    Takes the output of `request_user_timeline()` or `batch_request_user_timeline()`
+    and parses the results into a Pandas DataFrame.
 
+    Params
+    ------
+    tweet_list : A list of dicts
+        The list of tweets.  The attributes of each tweet are represented in a dict.
+
+    Returns
+    -------
+    tweet_df : Pandas DataFrame object
+        The dataframe with the parsed tweet object info.
     '''
     user_data = []
     ents_data = []
@@ -92,7 +112,7 @@ def wrangle_tweets_into_df(tweet_list):
 
     return tweet_df
 
-def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs={'tweet_mode':'extended', 'count':200}):
+def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_tweets=200, api_delay=0):
     '''
     Function to sample the most recent tweets (up to 200) from the timelines of a
     list of users.  
@@ -107,11 +127,12 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs
         The location to store csv file outputs.
     chunk_size : int
         The number of users to collect in each subset of data.
-    kwargs : dict
-        The keyword arguments to be passed to `request_user_timeline()`
-        See that function for details.
-
-    TODO: Hard-code the tweet_mode kwarg, code breaks without it, also hard-code default count as 200
+    n_tweets : int
+        The number of tweets to be requested from each user's timeline.  
+        Max is 3200.
+    api_delay : float
+        Number specifies length of sleep delay to include between requests.
+        Use this to stop the code tripping up on the API rate limits. 
     '''
     N = len(user_list)
 
@@ -120,7 +141,7 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs
         while j*chunk_size < N: # Iterate over chunks until complete
             tweets = []
             for i, user in enumerate(user_list[j*chunk_size:(j+1)*chunk_size]):
-                results = request_user_timeline(api, user, kwargs=kwargs)
+                results = request_user_timeline(api, user, n_tweets=n_tweets)
                 for tweet in results:
                     tweet.pop('author')
                 tweets.extend(results)
