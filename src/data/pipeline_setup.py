@@ -24,3 +24,15 @@ def build_data_dir(fp):
             if not present:
                 print('Creating directory '+folder)
                 os.mkdir(folder)
+
+def install_nltk_data():
+    '''
+    Download and install/update corpora from nltk which are used in the project.
+    '''
+    import nltk
+
+    corpus_list = ['stopwords', 'punkt']
+
+    for corpus in corpus_list:
+        nltk.download(corpus)
+
