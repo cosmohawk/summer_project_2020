@@ -6,8 +6,8 @@ def tokenize_text(text):
     '''
     Convert  string `text` into a list of word tokens.
 
-    Params
-    ------
+    Parameters
+    ----------
     text : str
         The text string to be tokenized.
         

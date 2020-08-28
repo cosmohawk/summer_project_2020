@@ -13,8 +13,8 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     If no keywords are provided, the request will return tweepy defaults, which
     will be the 20 most recent tweets of the user.
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.api.API object
         The API object to be used to make the request.
     user : str or int
@@ -72,8 +72,8 @@ def wrangle_tweets_into_df(tweet_list):
     Takes the output of `request_user_timeline()` or `batch_request_user_timeline()`
     and parses the results into a Pandas DataFrame.
 
-    Params
-    ------
+    Parameters
+    ----------
     tweet_list : A list of dicts
         The list of tweets.  The attributes of each tweet are represented in a dict.
 
@@ -119,8 +119,8 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
     Function to sample the most recent tweets (up to 200) from the timelines of a
     list of users.  
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.API instance
         The API authorisation hook used to make the requests.
     user_list : list

@@ -11,8 +11,8 @@ def request_user_info(api, screen_name=None, user_id=None, api_delay=True):
     Request user info from the twitter API using the `get_user` method based
     on either the user's twitter handle or ID number.  
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.api.API object
         The API object to be used to make the request.
     screen_name : str
@@ -56,8 +56,8 @@ def tweepy_user_to_dataframe(user):
     Take in a tweepy User object and parse the data contained within to return
     a single-row Pandas dataframe containing the same attributes as columns.
 
-    Params
-    ------
+    Parameters
+    ----------
     user : tweepy.models.User object
         The tweepy user information  object to be parsed into a dataframe.
 
@@ -88,8 +88,8 @@ def query_user_relationship(api, userA, userB):
     '''
     Asks the twitter API if user X follows user Y, and vice versa.
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy API instance
         The API object to be used to make the request.
     userA : str
@@ -115,8 +115,8 @@ def batch_request_user_info(api, user_list):
     '''
     Lookup a batch of users using the lookup method of the API.
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy API instance
         The API object to be used to make the request.
     user_list : list

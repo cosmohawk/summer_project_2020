@@ -12,8 +12,8 @@ def get_webpage(url):
     Function wrapped around the urllib method "urlopen" to retrieve webpages.
     Provides an additional check for instances when urlopen returns None.
 
-    Params
-    ------
+    Parameters
+    ----------
     url : string
         The web address from which to retrieve a page.  
 
@@ -35,8 +35,8 @@ def parse_divs_in_webpage(webpage):
     Use BeautifulSoup to parse HTML in the webpage, and return all the "div"
     elements on the page.  
 
-    Params
-    ------
+    Parameters
+    ----------
     webpage : object
         A HTTPResponse object
 
@@ -57,8 +57,8 @@ def get_handles_from_contents(contents):
     Use regex to identify twitter handles - which start with "@" - within the
     HTML of the div contents found using "parse_divs_in_webpage()".
 
-    Params
-    ------
+    Parameters
+    ----------
     contents : list object
         The parsed HTML contents of the page.  See `parse_divs_in_webpage()`
         for more.
@@ -78,8 +78,8 @@ def iterate_func_over_pages(url, func):
     Facilitates execution of regex-based functions over multiple pages of 
     search results.
 
-    Params
-    ------
+    Parameters
+    ----------
     url : string
         The url of the search term, the page info will be appended to this.
     func : function
@@ -116,8 +116,8 @@ def get_handles_by_keyword(kwd):
     provide a list of twitter handles for journalists relating to a topic 
     provided by `kwd`.
 
-    Params
-    ------
+    Parameters
+    ----------
     kwd : str
         String containing the search term to be used.  This should be a single
         word at present.
