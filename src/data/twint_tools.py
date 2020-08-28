@@ -198,6 +198,7 @@ def join_friends_csv(list_journalists,keyword):
         else:
             with open(filepath, newline='') as f:
                 reader = csv.reader(f)
+                next(reader, None) # trying to fix the bug
                 handles = list(reader)
                 all_handles.extend([handle[0] for handle in handles])
                 all_users.extend([name for handle in handles])

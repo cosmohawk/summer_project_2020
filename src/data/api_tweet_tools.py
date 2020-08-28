@@ -129,3 +129,4 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, kwargs
             full_path = filepath + 'user_timelines_subset_' + str(j) + '.csv'
             tweet_df.to_csv(full_path, index=False)
             j += 1
+            return tweet_df # I added this to have it handy for the following mentions function
