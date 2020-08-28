@@ -22,7 +22,7 @@ def clean_text(text):
     cleaned_text=re.sub(r'\@\w+','',cleaned_text) #remove mentions
     cleaned_text =re.sub(r'\#','',cleaned_text) #remove hashtags
     cleaned_text = re.findall(r'[A-Za-z]+',cleaned_text)
-    cleaned_text = ' '.join(cleaned_text)
+    cleaned_text = ' '.join(cleaned_text).lower()
 
     return cleaned_text
 
