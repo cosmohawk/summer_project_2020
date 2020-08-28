@@ -11,11 +11,12 @@ def clean_text(text):
     Params
     ------
     text : str
+        The text string to be cleaned up.
 
     Returns
     -------
     cleaned_text : str
-        
+        The text with non-alphanumeric characters removed.
     '''
     cleaned_text = re.sub(r"http\S+", "", text) #remove urls
     cleaned_text=re.sub(r'\S+\.com\S+','',cleaned_text) #remove urls
