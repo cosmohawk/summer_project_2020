@@ -29,10 +29,9 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     Returns
     -------
     TL_tweets : list
+        A list where each tweet retrieved is represented by a dict.
 
-    TODO
-    ----
-    - Check if try/except gets stuck if the api throws an error. I think with
+    TODO: Check if try/except gets stuck if the api throws an error. I think with
     current code iterating through the timeline would result in trying the same
     request over and over again. 
     '''    
@@ -49,22 +48,24 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
 
     page = 0
     response=True
-    while page<n_requests and response:
+    while page < n_requests and response:
         try:
             request = api.user_timeline(user, count=count,  tweet_mode='extended', page=page) 
-            # NOTE: count is hardcoded to give up to the maximum number of tweets per request
-            if request:
-                for tweet in request:
-                    TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
-
-                if api_delay>0:
-                    time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
-            else:
-                response = False
-            page += 1
         except Exception as x:
-            print(x)
+            request = x
+        
+        if isinstance(request, Exception):
+            response = False
+            print('Request #{} for {} threw an exception. Stopping...'.format(page, user))
+        else:
+            for tweet in request:
+                TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
 
+            if api_delay>0:
+                time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
+            
+        page += 1
+        
     return TL_tweets
 
 def wrangle_tweets_into_df(tweet_list):
