@@ -5,8 +5,8 @@ def build_data_dir(fp):
     Function to which checks for standard-format data directory at the location specified.
     If directory or any of its sub-folders do not exist, this creates them.
     
-    Params
-    ------
+    Parameters
+    ----------
     fp : str
         The filepath (preferably absolute) to the parent location of the data directory.
     '''

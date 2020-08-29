@@ -13,8 +13,8 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     If no keywords are provided, the request will return tweepy defaults, which
     will be the 20 most recent tweets of the user.
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.api.API object
         The API object to be used to make the request.
     user : str or int
@@ -29,14 +29,15 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
     Returns
     -------
     TL_tweets : list
+        A list where each tweet retrieved is represented by a dict.
 
-    TODO
-    ----
-    - Check if try/except gets stuck if the api throws an error. I think with
+    TODO: Check if try/except gets stuck if the api throws an error. I think with
     current code iterating through the timeline would result in trying the same
     request over and over again. 
     '''    
     TL_tweets = []
+
+    count = n_tweets if n_tweets < 200 else 200
 
     # Make tweepy cursor to iterate through requests
     n_requests = math.ceil(n_tweets/200)
@@ -47,22 +48,24 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
 
     page = 0
     response=True
-    while page<n_requests and response:
+    while page < n_requests and response:
         try:
-            request = api.user_timeline(user, count=200,  tweet_mode='extended', page=page) 
-            # NOTE: count is hardcoded to give up to the maximum number of tweets per request
-            if request:
-                for tweet in request:
-                    TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
-
-                if api_delay>0:
-                    time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
-            else:
-                response = False
-            page += 1
+            request = api.user_timeline(user, count=count,  tweet_mode='extended', page=page) 
         except Exception as x:
-            print(x)
+            request = x
+        
+        if isinstance(request, Exception):
+            response = False
+            print('Request #{} for {} threw an exception. Stopping...'.format(page, user))
+        else:
+            for tweet in request:
+                TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
 
+            if api_delay>0:
+                time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
+            
+        page += 1
+        
     return TL_tweets
 
 def wrangle_tweets_into_df(tweet_list):
@@ -70,8 +73,8 @@ def wrangle_tweets_into_df(tweet_list):
     Takes the output of `request_user_timeline()` or `batch_request_user_timeline()`
     and parses the results into a Pandas DataFrame.
 
-    Params
-    ------
+    Parameters
+    ----------
     tweet_list : A list of dicts
         The list of tweets.  The attributes of each tweet are represented in a dict.
 
@@ -117,8 +120,8 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
     Function to sample the most recent tweets (up to 200) from the timelines of a
     list of users.  
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.API instance
         The API authorisation hook used to make the requests.
     user_list : list
