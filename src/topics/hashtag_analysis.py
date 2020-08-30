@@ -119,7 +119,27 @@ def make_topic_keywords_from_svd(svd_vectors, threshold=0.2):
 
     Parameters
     ----------
-
+    svd_vectors : Pandas DataFrame
+        Dataframe containing the scores of each feature in the original space
+        for each SVD component.
+    threshold : float
+        A significant threshold to apply on the selection of relevant keywords.
+        Only keywords with a score greater than the threshold are returned for
+        each component.
+    
     Returns
     -------
+    topic_kwds : Pandas DataFrame
+        Dataframe where the index is the topic number, and the chosen keywords
+        are contained as a list in the `keywords` column.
+        Topics for which no keywords were returned are dropped from the
+        returned dataframe.
     '''
+    topic_kwds = pd.DataFrame(svd_vectors.apply(lambda x: svd_vectors.columns[x>threshold].tolist(), axis=1), 
+                              columns=['keywords'], 
+                              index=svd_vectors.index)
+    topic_kwds.index.name = 'topic'
+    
+    topic_kwds = topic_kwds[topic_kwds.astype(str)['keywords'] != '[]']
+    
+    return topic_kwds
