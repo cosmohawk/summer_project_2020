@@ -7,8 +7,8 @@ def connect_API(keys_file):
     Load twitter API credentials and return a tweepy API instance with which to
     make API calls.
 
-    Params
-    ------
+    Parameters
+    ----------
     keys_file : str
         The path to a `*.json` file containing the twitter API credentials to
         be used.  See the notebook `store_twitter_credentials_as_json.ipynb`

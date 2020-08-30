@@ -11,8 +11,8 @@ def request_user_info(api, screen_name=None, user_id=None, api_delay=True):
     Request user info from the twitter API using the `get_user` method based
     on either the user's twitter handle or ID number.  
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy.api.API object
         The API object to be used to make the request.
     screen_name : str
@@ -51,25 +51,13 @@ def request_user_info(api, screen_name=None, user_id=None, api_delay=True):
 
     return user_info
 
-def batch_pull_user_info(api, users_list, kwargs):
-    '''
-    Get user info for a set of users.  
-
-    '''
-    users_data = {}
-
-    for user in users_list:
-        users_data[user] = request_user_info(api, )
-
-    return users_data
-
 def tweepy_user_to_dataframe(user):
     '''
     Take in a tweepy User object and parse the data contained within to return
     a single-row Pandas dataframe containing the same attributes as columns.
 
-    Params
-    ------
+    Parameters
+    ----------
     user : tweepy.models.User object
         The tweepy user information  object to be parsed into a dataframe.
 
@@ -100,8 +88,8 @@ def query_user_relationship(api, userA, userB):
     '''
     Asks the twitter API if user X follows user Y, and vice versa.
 
-    Params
-    ------
+    Parameters
+    ----------
     api : tweepy API instance
         The API object to be used to make the request.
     userA : str
@@ -122,3 +110,39 @@ def query_user_relationship(api, userA, userB):
                 'BfollowsA' : statusB.following}
     
     return statuses
+
+def batch_request_user_info(api, user_list):
+    '''
+    Lookup a batch of users using the lookup method of the API.
+
+    Parameters
+    ----------
+    api : tweepy API instance
+        The API object to be used to make the request.
+    user_list : list
+    A list of strings or ints containing either the handles or ID numbers
+    of the users to look up.
+
+    Returns
+    -------
+    full_list : 
+        A list of tweepy user objects. See 'INSERT FUNCTION' for turning these
+        objects into a useful dataframe
+    '''
+    N = len(user_list)
+    # Go through and check whether ID or name has been provided
+    if all(isinstance(item, str) for item in user_list): 
+        key = 'screen_names'
+    elif all(isinstance(item, int) for item in user_list):
+        key = 'user_ids'
+    else:
+        Exception('List needs to be exclusively ints or strings')
+
+    full_list = []
+    for i in range(0, N, 100):
+        search = {key: user_list[i:i+100]} # API user lookup takes up to 100 names per request
+        lookup = api.lookup_users(**search)
+        time.sleep(1)
+        full_list.extend(lookup)
+    
+    return full_list
