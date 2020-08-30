@@ -139,7 +139,7 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
     '''
     N = len(user_list)
 
-    with tqdm(total=N, desc='User timelines') as pbar: # Create Progress bar
+    with tqdm(total=N, desc='User timelines', file=sys.stdout) as pbar: # Create Progress bar
         j=0
         while j*chunk_size < N: # Iterate over chunks until complete
             tweets = []
