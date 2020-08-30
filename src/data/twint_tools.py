@@ -212,4 +212,6 @@ def join_friends_csv(list_journalists,keyword):
     print('\nZero following in list for users: '+str(failed))
     df = pd.DataFrame(list(zip(all_users, all_handles)), 
                    columns =['screen_name', 'friend'])
+    df['screen_name'] = df['screen_name'].str.lower()
+    df['friend'] = df['friend'].str.lower()
     return df
