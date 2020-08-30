@@ -61,8 +61,8 @@ def request_user_timeline(api, user, api_delay=0, n_tweets=200):
             for tweet in request:
                 TL_tweets.append({key: vars(tweet)[key] for key in list(vars(tweet).keys())[2:]}) # parse tweets from object into list of dicts
 
-            if api_delay>0:
-                time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
+        if api_delay>0:
+            time.sleep(api_delay) # Allowed to make 900 requests per 15 minutes, or 1 per second
             
         page += 1
         
@@ -144,7 +144,7 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
         while j*chunk_size < N: # Iterate over chunks until complete
             tweets = []
             for i, user in enumerate(user_list[j*chunk_size:(j+1)*chunk_size]):
-                results = request_user_timeline(api, user, n_tweets=n_tweets)
+                results = request_user_timeline(api, user, n_tweets=n_tweets, api_delay=api_delay)
                 for tweet in results:
                     tweet.pop('author')
                 tweets.extend(results)
@@ -153,4 +153,4 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
             full_path = filepath + 'user_timelines_subset_' + str(j) + '.csv'
             tweet_df.to_csv(full_path, index=False)
             j += 1
-            return tweet_df # I added this to have it handy for the following mentions function
+            
