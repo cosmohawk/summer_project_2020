@@ -140,6 +140,29 @@ def make_topic_keywords_from_svd(svd_vectors, threshold=0.2):
                               index=svd_vectors.index)
     topic_kwds.index.name = 'topic'
     
-    topic_kwds = topic_kwds[topic_kwds.astype(str)['keywords'] != '[]']
+    topic_kwds = topic_kwds[topic_kwds.astype(str)['keywords'] != '[]'] # drop topics which are empty
     
     return topic_kwds
+
+def label_data_by_topic(topic_space, threshold):
+    '''
+    Takes the SVD transformed data vectors and assigns a label based on most significant axis.
+    Threshold can be used to further filter out noise.
+
+    Parameters
+    ----------
+    topic_space : Pandas DataFrame
+        DF which contains the results of dimension reduction by SVD.
+    threshold : float
+        The value above which label assignment is considered valid.
+        To be used to remove spurious association of tweets with a topic.
+
+    Returns
+    -------
+    labels : Pandas DataFrame
+        Has one column which contains the topic label assigned to each tweet.
+    '''
+    label_series = topic_space.apply(lambda x: topic_space.columns[[a and b for a, b in zip(x>threshold, x==x.max())]], axis=1)
+    labels = pd.DataFrame(label_series.apply(lambda x: x[0] if len(x)>0 else np.nan), columns=['labels',])
+    
+    return labels
