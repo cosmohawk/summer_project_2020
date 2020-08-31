@@ -127,11 +127,8 @@ def get_handles_by_keyword(kwd):
     handle_list : list object
         A list of strings containing the twitter handles scraped over all pages of
         search results.
-
-    TODO
-    ----
-    Add code to handle spaces in the search term.
     '''
+    kwd = kwd.replace(" ", "%20") # replace spaces in search keyword for use in URL
 
     url = r'https://www.journalism.co.uk/prof/?search='+kwd
 

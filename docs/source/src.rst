@@ -10,7 +10,7 @@ Subpackages
    src.data
    src.features
    src.models
-   src.topic_modelling
+   src.topics
    src.visualization
 
 Module contents

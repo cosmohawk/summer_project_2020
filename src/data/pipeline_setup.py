@@ -32,7 +32,7 @@ def install_nltk_data():
     '''
     import nltk
 
-    corpus_list = ['stopwords', 'punkt']
+    corpus_list = ['stopwords', 'punkt', 'wordnet']
 
     for corpus in corpus_list:
         nltk.download(corpus)
