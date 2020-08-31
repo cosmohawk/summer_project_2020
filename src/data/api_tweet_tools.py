@@ -1,4 +1,5 @@
 import sys
+import os
 import time
 import datetime
 from tqdm import tqdm
@@ -150,6 +151,10 @@ def batch_request_user_timeline(api, user_list, filepath, chunk_size=500, n_twee
                 tweets.extend(results)
                 pbar.update(1)
             tweet_df = wrangle_tweets_into_df(tweets)
+
+            if not os.path.exists(filepath):
+                os.makedirs(filepath)
+
             full_path = filepath + 'user_timelines_subset_' + str(j) + '.csv'
             tweet_df.to_csv(full_path, index=False)
             j += 1
