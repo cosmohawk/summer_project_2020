@@ -87,7 +87,7 @@ def load_users(filename, graph):
 
 def load_existing_users(filename, graph):
     '''
-    function to load user information contained in a '*.csv' file into the graph database
+    Function to load user information contained in a '*.csv' file into the graph database
     to be used when users ARE already in the database
     
     Parameters
@@ -116,7 +116,7 @@ def load_existing_users(filename, graph):
 
 def get_posts(graph):
     '''
-    function to draw edges between Tweet and Person nodes based on user id
+    Function to draw edges between Tweet and Person nodes based on user id
 
     Parameters
     -------
@@ -380,7 +380,7 @@ def get_chi2(df):
 
     Returns
     -------
-    no_loners : pandas dataframe
+    no_loners : DataFrame object
         contains augmented user information with singularities (users with zero friends) removed
         should be same dimensions as df
     '''
