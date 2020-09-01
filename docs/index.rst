@@ -10,9 +10,9 @@ Welcome to Aug20Ditchley's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   contributors
    setup
    pipeline
-   contributors
    docs
    
 
@@ -21,6 +21,8 @@ Welcome to Aug20Ditchley's documentation!
    :caption: Reference:
 
    source/src
+   reqs
+
 
 Indices and tables
 ==================
