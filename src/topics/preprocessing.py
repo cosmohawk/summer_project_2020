@@ -2,6 +2,9 @@ import sys
 import re
 import nltk
 
+from nltk.corpus import stopwords
+stop_words = set(stopwords.words('english'))
+
 def tokenize_text(text):
     '''
     Convert  string `text` into a list of word tokens.
