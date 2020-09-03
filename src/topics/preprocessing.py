@@ -2,14 +2,20 @@ import sys
 import re
 import nltk
 
-def tokenize_text(text):
+from nltk.corpus import stopwords
+stop_words = set(stopwords.words('english'))
+
+def tokenize_text(text, min_characters_word):
     '''
     Convert  string `text` into a list of word tokens.
+    Removes stopwords and words that are too short.
 
     Parameters
     ----------
     text : str
         The text string to be tokenized.
+    min_characters_word : int
+        Words must be longer than this to be accepted as a token.
         
     Returns
     -------
