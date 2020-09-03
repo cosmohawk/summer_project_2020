@@ -71,3 +71,36 @@ def loop_csv_H_index(src_dir, dest_dir, keyword):
 	df_like_count.to_csv(os.path.join(dest_dir, keyword + '_like_rt_count_users.csv'), index=True)
 	#return hdict_df
 	#return df_like_count#hdict_df.to_csv(os.path.join(dest_dir, keyword + '_h_index_users.csv'), index=False)
+
+def plot_H_index(df):
+	'''
+	
+
+	Parameters
+	------
+	
+
+	Returns
+	-------
+	
+	'''
+	import seaborn as sns
+	import matplotlib.pyplot as plt
+	sns.set(font_scale=2) 
+	f = plt.figure(figsize=(20, 25))
+	gs = f.add_gridspec(2, 1)
+	ax = f.add_subplot(gs[0, 0])
+	sns.distplot(df['h-index_like&retweets'], kde=False, rug=False);
+	ax.set_xlabel('H-Index (like&retweets)', fontsize=50)
+	ax.set_ylabel('N of users', fontsize=50)
+
+	ax = f.add_subplot(gs[1, 0])
+	sns.scatterplot(df['user_friends_n'],df['user_followers_n'], 
+					size = df['h-index_like&retweets'],hue =df['h-index_like&retweets'],  
+					alpha=0.4, sizes=(20, 200))
+	ax.set_xlabel('Number of Friends', fontsize=50)
+	ax.set_ylabel('Number of Followers', fontsize=50)
+	ax.set_xscale('log')
+	ax.set_yscale('log')
+	ax.set_ylim(1, max(df['user_followers_n'])+1000000000)
+	ax.set_xlim(0.5)
