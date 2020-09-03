@@ -61,9 +61,11 @@ def make_tSNE_projection_of_SVD(df, kwargs={}):
     Parameters
     ----------
     df : Pandas DataFrame
-
+        A dataframe with the reduced-dimensionality vector representation
+        of tweets.
     kwargs : dict
-
+        Optional keyword arguments which can be fed to sci-kit learn's TSNE
+        model.
 
     Returns
     -------
@@ -84,7 +86,7 @@ def make_tSNE_projection_of_SVD(df, kwargs={}):
     tsne = skm.TSNE(n_components=2, **kwargs)
     tsneout = tsne.fit_transform(df)
 
-    coords = pd.DataFrame([tsneout[:,0], tsneout[:,1]], columns=['tsne_x', 'tsne_y'])
+    coords = pd.DataFrame(tsneout, columns=['tsne_x', 'tsne_y'], index=df.index)
 
     return coords
 
@@ -105,24 +107,53 @@ def plot_tsne_projection(df, label_str, plotly=False, kwargs={}):
         If False, use matplotlib.
     '''
 
-    if plotly:
+    if plotly: # Import and use plotly
+        import plotly.express as px
+
         defaults = dict(
             width=800,
             height=800,
-            hover_name='screen_name',
-            hover_data=['hashtags'],
+            #hover_name='screen_name',
+            #hover_data=['hashtags'],
             color_discrete_sequence=px.colors.qualitative.Bold
         )
         for key in defaults.keys():
             if key not in kwargs:
                 kwargs[key] = defaults[key]
 
-        import plotly.express as px
-
-        px.scatter(viz, 'tsne_x', 'tsne_y', color=label_str, **kwargs)
+        fig = px.scatter(df, 'tsne_x', 'tsne_y', color=label_str, **kwargs)
 
     else: # Use Matplotlib
         fig, ax = plt.subplots(1,1)
         ax.scatter(df['tsne_x'], df['tsne_y'], c=df[label_str].astype(int), cmap='tab20')
         fig.set_size_inches(10,10)
-        fig.show()
+    
+    return fig
+
+def plot_H_index(df):
+    '''
+
+    Parameters
+    ------
+
+    Returns
+    -------
+
+    '''
+    sns.set(font_scale=2)
+    f = plt.figure(figsize=(20, 25))
+    gs = f.add_gridspec(2, 1)
+    ax = f.add_subplot(gs[0, 0])
+    sns.distplot(df['h-index_like&retweets'], kde=False, rug=False)
+    ax.set_xlabel('H-Index (like&retweets)', fontsize=50)
+    ax.set_ylabel('N of users', fontsize=50)
+    ax = f.add_subplot(gs[1, 0])
+    sns.scatterplot(df['user_friends_n'],df['user_followers_n'],
+                     size = df['h-index_like&retweets'],hue =df['h-index_like&retweets'],
+                     alpha=0.4, sizes=(20, 200))
+    ax.set_xlabel('Number of Friends', fontsize=50)
+    ax.set_ylabel('Number of Followers', fontsize=50)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_ylim(1, max(df['user_followers_n'])+1000000000)
+    ax.set_xlim(0.5)
