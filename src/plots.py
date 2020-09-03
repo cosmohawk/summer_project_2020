@@ -9,6 +9,7 @@ from PIL import Image
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 
 import matplotlib.pyplot as plt
+import seaborn as sns
 plt.ion()
 
 def wordcloud_plot(text, filename=None, cloudargs={}):
@@ -47,7 +48,6 @@ def wordcloud_plot(text, filename=None, cloudargs={}):
     fig.set_size_inches(8,8)
     ax.imshow(wordcloud, interpolation='bilinear')
     ax.axis('off')
-    fig.show()
 
     if filename is not None:
         fig.savefig(filename+'.jpg', dpi=300)
@@ -105,6 +105,11 @@ def plot_tsne_projection(df, label_str, plotly=False, kwargs={}):
     plotly: bool
         If True, use plotly for the visualisation.
         If False, use matplotlib.
+    
+    Returns
+    -------
+    fig : Figure
+        A reference to either a plotly or a matplotlib figure.  
     '''
 
     if plotly: # Import and use plotly
@@ -132,22 +137,27 @@ def plot_tsne_projection(df, label_str, plotly=False, kwargs={}):
 
 def plot_H_index(df):
     '''
+    Plot the distribution of h-indices for a set of users.
 
     Parameters
     ------
+    df : Pandas DataFrame
+        A dataframe which needs to have columns: `h-index_like&retweets`, 
+        `user_friends_n` and `user_followers_n`
 
     Returns
     -------
-
+    fig : Figure
+        A reference to a Seaborn/Matplotlib figure.
     '''
     sns.set(font_scale=2)
-    f = plt.figure(figsize=(20, 25))
-    gs = f.add_gridspec(2, 1)
-    ax = f.add_subplot(gs[0, 0])
+    fig = plt.figure(figsize=(20, 25))
+    gs = fig.add_gridspec(2, 1)
+    ax = fig.add_subplot(gs[0, 0])
     sns.distplot(df['h-index_like&retweets'], kde=False, rug=False)
     ax.set_xlabel('H-Index (like&retweets)', fontsize=50)
     ax.set_ylabel('N of users', fontsize=50)
-    ax = f.add_subplot(gs[1, 0])
+    ax = fig.add_subplot(gs[1, 0])
     sns.scatterplot(df['user_friends_n'],df['user_followers_n'],
                      size = df['h-index_like&retweets'],hue =df['h-index_like&retweets'],
                      alpha=0.4, sizes=(20, 200))
@@ -157,3 +167,35 @@ def plot_H_index(df):
     ax.set_yscale('log')
     ax.set_ylim(1, max(df['user_followers_n'])+1000000000)
     ax.set_xlim(0.5)
+
+    return fig
+
+def plot_user_inliers(inliers, outliers):
+    '''
+    Create a plot of the user distribution in terms of friends and followers,
+    colour-coded by inliers and outliers.
+
+    Parameters
+    ----------
+    inliers : Pandas DataFrame
+        A dataframe which contains a list of users identified as inliers, 
+        and their numbers of friends and followers.
+    outliers : Pandas DataFrame
+        A dataframe which contains a list of users identified as outliers, 
+        and their numbers of friends and followers.
+
+    Returns
+    -------
+    fig : Figure
+        A reference to a matplotlib figure
+    '''
+    fig, ax = plt.subplots(1,1)
+    ax.scatter(inliers['user_friends_n'],inliers['user_followers_n'],label='inliers')
+    ax.scatter(outliers['user_friends_n'],outliers['user_followers_n'],label='outliers')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlabel('user_friends_n')
+    ax.set_ylabel('user_followers_n')
+    fig.legend()
+
+    return fig
