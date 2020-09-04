@@ -233,8 +233,9 @@ def produce_random_sample(df, df_column, number_of_samples):
     sample_df : Pandas dataframe
         dataframe containing random samples from original dataframe
     '''
+    import random
     sample_df = pd.DataFrame()
-    for label in labelled_data['main_label'].unique():
+    for label in df_column.unique():
         rnd_idx = random.sample(range(df[df_column==label].shape[0]), number_of_samples)
         sample_df = pd.concat([sample_df, df[df_column==label].iloc[rnd_idx]], axis=0)
     return sample_df
