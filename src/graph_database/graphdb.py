@@ -7,7 +7,7 @@ def get_graph(new_graph=True):
     '''
     Load an existing neo4j database or create a new one and return a graph object
 
-    Params
+    Parameters
     -------
     new_graph :  boolean
         True if a fresh graph is wanted, i.e. if the user wants to clear the database
@@ -30,7 +30,7 @@ def load_tweets(filename, graph):
     Load tweets into the graph database as nodes. Uses 'CREATE' therefore duplicate
     nodes may be created if items are already in the database.
 
-    Params
+    Parameters
     -------
     filename : str
         The path to a '*.csv' file containing tweet data
@@ -62,7 +62,7 @@ def load_users(filename, graph):
     function to load user information contained in a '*.csv' file into the graph database
     to be used when users are not already in the database
 
-    Params
+    Parameters
     -------
     filename : str
          name of file containing user information
@@ -91,7 +91,7 @@ def load_existing_users(filename, graph):
     function to load user information contained in a '*.csv' file into the graph database
     to be used when users ARE already in the database
     
-    Params
+    Parameters
     -------
     filename : str
         name of file containing user information
@@ -119,7 +119,7 @@ def get_posts(graph):
     '''
     function to draw edges between Tweet and Person nodes based on user id
 
-    Params
+    Parameters
     -------
     graph : graph
 
@@ -139,7 +139,7 @@ def load_friends(filename,graph,new=False):
     ''' 
     Load friend information from a '*.csv' file into the databse, draw FOLLOWS edges
     
-    Params
+    Parameters
     -------
     filename : str
         location of file with friend information
@@ -176,7 +176,7 @@ def load_mentions(filename,graph):
     '''
     Loads mention information from a file and draws edges connecting Tweet and Person nodes
 
-    Params
+    Parameters
     -------
     filename : str
         location of '*.csv' file containing mentions information
@@ -200,7 +200,7 @@ def run_pagerank(nodelist,edgelist,graph,new_native_graph=True):
     '''
     Runs the page rank algorithm on the graph network
 
-    Params
+    Parameters
     -------
     nodelist : list of str
         list of node types to include in projection
@@ -261,7 +261,7 @@ def get_weighted_sample(ranked_df,sample_size,field,weight_exponent=2):
     '''
     Gets a weighted random sample of users
 
-    Params
+    Parameters
     -------
     ranked_df : panadas dataframe
         contains the user names and the parameters on which to weight
@@ -319,7 +319,7 @@ def get_talk_about_edges(graph):
     Draw TALKS_ABOUT edges on the graph connecting Person nodes.
     Requires Tweet nodes, POSTS and MENTIONS edges to already be in the graph
 
-    Params
+    Parameters
     -------
     graph : graph
 
@@ -344,7 +344,7 @@ def filter_users_by_keywords(keywords,graph,without=False):
     '''                                                                                                                                                                          
     Function to select only twitter users with certain keywords in their bio (or screen name)                                                                                    
                                                                                                                                                                                  
-    Params                                                                                                                                                                       
+    Parameters                                                                                                                                                                       
     -------                                                                                                                                                                      
     keywords : list of str                                                                                                                                                       
         list of keywords to select users by                                                                                                                                      
@@ -391,7 +391,7 @@ def get_chi2(df):
     '''
     Calculate the chi2 of users based on the assumption that follower and friend numbers are lognormally distributed
 
-    Params
+    Parameters
     -------
     df : pandas dataframe
         contains user information
@@ -427,7 +427,7 @@ def excise_outliers(outlier_list,graph):
     '''
     Delete list of users and all their connections from a graph
     
-    Params
+    Parameters
     -------
     outlier_list : list of str
         list of user names of users to be deleted
@@ -449,7 +449,7 @@ def boost_graph(niter,nsample,fields,exponents,pagerank_params,keyword,kwargs):
     if they are following other people already in the graph then follower edges are drawn in
     new users are not added to the graph.
 
-    Params
+    Parameters
     --------
     niter : int
         number of boosting iterations
@@ -499,3 +499,89 @@ def boost_graph(niter,nsample,fields,exponents,pagerank_params,keyword,kwargs):
     
     return
 
+def load_topics(fn_topics,graph,threshhold):
+    '''
+    Function to read in file containing the results of the topic modelling and to load it onto the graph.
+    Topics are assigned to nodes and edges drawn between users weighted by their association with that topic.
+    (:Person)-[:TWEETS_ABOUT]->(:Topic)
+    
+    Parameters
+    -------
+    fn_topics : str
+        location of file containing users and their topic weights
+        
+    graph : graph
+    
+    threshhold : float
+        The minimum weight to assign to a TWEETS_ABOUT edge
+        
+    Returns
+    -------
+    Void
+    
+    '''
+    query_string = '''LOAD CSV WITH HEADERS FROM "file:///'''+fn_topics+'''" AS row
+    UNWIND keys(row) AS keyn
+    MATCH (p:Person {screen_name: row.screen_name})
+    WHERE toFloat(row[keyn]) >= '''+str(threshhold)+'''
+    MERGE (t:Topic {name: keyn})
+    CREATE (p)-[:TWEETS_ABOUT {frequency: toFloat(row[keyn])}]->(t)'''
+    graph.run(query_string)
+    
+    return
+
+def filter_by_topic(keyword,graph):
+    '''
+    Function returns a list of individuals associated with a particular topic.
+    
+    Parameters 
+    -------
+    
+    keyword : str
+        The topic one wishes to filter on
+        
+    graph : graph
+    
+    Returns
+    -------
+    
+    names : pandas dataframe
+        A list of user names associated with that topic
+    '''
+
+    query_string = '''MATCH (p)-[:TWEETS_ABOUT]->(t:Topic)
+        WHERE t.name = "'''+keyword+'''" OR toLower(t.name) = "'''+keyword+'''"
+        RETURN p.screen_name'''
+    ans = graph.run(query_string)
+
+    names = pd.DataFrame.from_records(ans,columns=['screen name'])
+    
+    return names
+
+def add_property(property_name,dataframe,graph):
+    '''
+    Routine to add a property to nodes in the graph.
+    
+    Parameters
+    -------
+    property_name : str
+        The name of the property to be added to the node, 
+        should be the name of a column heading in the dataframe.
+        
+    dataframe : pandas dataframe
+        Dataframe containing at least the user names and the property to be added to these users
+        
+    graph : graph
+    
+    Returns
+    -------
+    Void
+    '''
+    for index, row in dataframe.iterrows():
+        query_string = '''
+        MATCH (p:Person) WHERE p.screen_name = "'''+row['screen_name']+'''"
+        SET p.'''+property_name+''' = '''+str(row[property_name])+'''
+        '''
+        graph.run(query_string)
+    return
+    
