@@ -215,3 +215,27 @@ def check_keyword_matches(text, topic_list):
     words = text.split(' ')
     matches = [word for word in words if word in topic_list]
     return matches
+
+def produce_random_sample(df, df_column, number_of_samples) 
+ '''
+    Pro.
+    
+    Parameters
+    ----------
+    df : Pandas dataframe
+    
+    df_column : Pandas dataframe column
+    
+    number_of_samples : number to sample in each group 
+            
+    Returns
+    -------
+    sample_df : Pandas dataframe
+        dataframe containing random samples from original dataframe
+    '''
+    sample_df = pd.DataFrame()
+    for label in labelled_data['main_label'].unique():
+        rnd_idx = random.sample(range(df[df_column==label].shape[0]), number_of_samples)
+        sample_df = pd.concat([sample_df, df[df_column==label].iloc[rnd_idx]], axis=0)
+    return sample_df
+
