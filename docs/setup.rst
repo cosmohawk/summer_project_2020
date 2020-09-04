@@ -105,7 +105,14 @@ Click on ``Open Folder`` to go straight to the graph directory.
 From the directory that opens, you want to copy the filepath, which will look something like this:
 ``D:\neo4j\neo4jDatabases\database-47d324c5-ebe5-4afa-b595-e91969807b1b\installation-4.1.0``
 
+Within this directory, we want to create a symbolic link inside the ``imports`` folder to our data directory.
+On Windows 10, this is slightly convoluted, so we give an example below:
 
+#. Open the command line prompt ``cmd`` *as an administrator*.
+#. Run the command ``mklink /D graph-dir/import/data target-data-dir``
+   For example: ``mklink /D D:\Dev\neo4j\neo4jDatabases\database-47d324c5-ebe5-4afa-b595-e91969807b1b\installation-4.1.0\import\data D:\S2DS\Ditchley\Aug20_Ditchley\data``
+
+If the link creation is successful, you're now good to go, start your graph and import data!
 
 Neo4j Graph Database Plugins
 ----------------------------
