@@ -4,6 +4,7 @@ Statistical Analysis
 Part of the process of refining the list of users we want to include involves examining the distribution of user attributes.
 
 Here, two metrics can be drawn from user profiles which can be used to weed out some celebrities and other accounts that are not relevant:
+
 * the number of *friends* a user has and
 * the number of *followers*.
 
