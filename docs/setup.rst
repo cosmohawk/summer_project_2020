@@ -110,9 +110,12 @@ On Windows 10, this is slightly convoluted, so we give an example below:
 
 #. Open the command line prompt ``cmd`` *as an administrator*.
 #. Run the command ``mklink /D graph-dir/import/data target-data-dir``
-   For example: ``mklink /D D:\Dev\neo4j\neo4jDatabases\database-47d324c5-ebe5-4afa-b595-e91969807b1b\installation-4.1.0\import\data D:\S2DS\Ditchley\Aug20_Ditchley\data``
+   For example: ``mklink /D D:\neo4j\neo4jDatabases\database-47d324c5-ebe5-4afa-b595-e91969807b1b\installation-4.1.0\import\data D:\Aug20_Ditchley\data``
 
 If the link creation is successful, you're now good to go, start your graph and import data!
+
+On Mac/Linux, the command for making the symbolic link would be something like:
+``ln -s /mnt/neo4j/neo4jDatabases/database-47d324c5-ebe5-4afa-b595-e91969807b1b/installation-4.1.0/import/data /mnt/Aug20_Ditchley/data``
 
 Neo4j Graph Database Plugins
 ----------------------------
