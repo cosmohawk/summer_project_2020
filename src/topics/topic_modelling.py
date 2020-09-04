@@ -1,20 +1,19 @@
 def vec_for_learning(model, tagged_docs):
     '''
-    
+    Building the final vector feature for the classifier
 
     Parameters
     ----------
-    model :
-        
-    tagged_docs : 
+    model : the model
+        (either: model_dbow, model_dmm, model_new)
+    tagged_docs : tagged documents
         
     Returns
     -------
     tokens : targets, regressors
         
     '''
-    
-    
+       
     sents = tagged_docs.values
     targets, regressors = zip(*[(doc.tags[0], model.infer_vector(doc.words, steps=20)) for doc in sents])
     return targets, regressors
@@ -22,13 +21,14 @@ def vec_for_learning(model, tagged_docs):
 
 def get_vectors(model, tagged_docs):
     '''
-    
+    Building feature vectors
 
     Parameters
     ----------
-    model :
+    model : the model
+        (either: model_dbow, model_dmm, model_new)
         
-    tagged_docs : 
+    tagged_docs : tagged documents
         
     Returns
     -------
@@ -49,9 +49,9 @@ def get_vectors_apply(model, docs_to_classify):
 
     Parameters
     ----------
-    model :
-        
-    docs_to_classify : 
+    model : the model
+        (either: model_dbow, model_dmm, model_new)
+    docs_to_classify : documents to classify
         
     Returns
     -------
@@ -72,13 +72,13 @@ def clean_text(text):
 
     Parameters
     ----------
-    model :
-        
-    tagged_docs : 
-        
+    text : str
+        test to clean
+            
     Returns
     -------
-    tokens : tergets, regressors
+    text : srt
+        cleaned text
         
     '''
     
