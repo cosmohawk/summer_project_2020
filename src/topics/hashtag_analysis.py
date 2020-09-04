@@ -216,8 +216,8 @@ def check_keyword_matches(text, topic_list):
     matches = [word for word in words if word in topic_list]
     return matches
 
-def produce_random_sample(df, df_column, number_of_samples) 
- '''
+def produce_random_sample(df, df_column, number_of_samples):
+    '''
     Pro.
     
     Parameters
