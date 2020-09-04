@@ -1,5 +1,10 @@
 The Data Pipeline
 =================
 
-Stuff here
+.. include:: data_collection.rst
 
+.. include:: graph_database.rst
+
+.. include:: topic_modelling.rst
+
+.. include:: statistical_analysis.rst

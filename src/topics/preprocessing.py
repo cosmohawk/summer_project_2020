@@ -2,9 +2,11 @@ import sys
 import re
 import nltk
 
+
 def tokenize_text(text, x):
     '''
     Convert  string `text` into a list of word tokens.
+    Removes stopwords and words that are too short.
 
     Parameters
     ----------
@@ -14,7 +16,9 @@ def tokenize_text(text, x):
         the minimum length of words to be included
     Returns
     -------
-    tokens : list of strings
+    tokens : list of strings[InternetShortcut]
+URL=https://github.com/S2DSLondon/Aug20_Ditchley/stargazers
+
         `text` broken up into tokens.
     '''
     tokens = []

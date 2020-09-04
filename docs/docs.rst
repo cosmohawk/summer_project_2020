@@ -14,3 +14,8 @@ Once these are installed, navigate to the ``/docs`` folder of the repo and build
     sphinx-apidoc -o source/ ../src
     make html
 
+If you have an installation of LaTeX on your machine, you can also generate a pdf with:
+
+.. code-block:: bash
+
+    make latexpdf

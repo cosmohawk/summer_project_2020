@@ -58,7 +58,7 @@ def load_tweets(filename, graph):
 
 def load_users(filename, graph):
     '''
-    function to load user information contained in a '*.csv' file into the graph database
+    Function to load user information contained in a '*.csv' file into the graph database
     to be used when users are not already in the database
 
     Parameters
