@@ -2,10 +2,8 @@ import sys
 import re
 import nltk
 
-from nltk.corpus import stopwords
-stop_words = set(stopwords.words('english'))
 
-def tokenize_text(text, min_characters_word):
+def tokenize_text(text, x):
     '''
     Convert  string `text` into a list of word tokens.
     Removes stopwords and words that are too short.
@@ -14,19 +12,20 @@ def tokenize_text(text, min_characters_word):
     ----------
     text : str
         The text string to be tokenized.
-    min_characters_word : int
-        Words must be longer than this to be accepted as a token.
-        
+    x : interger or variable
+        the minimum length of words to be included
     Returns
     -------
-    tokens : list of strings
+    tokens : list of strings[InternetShortcut]
+URL=https://github.com/S2DSLondon/Aug20_Ditchley/stargazers
+
         `text` broken up into tokens.
     '''
     tokens = []
 
     for sent in nltk.sent_tokenize(text):
         for word in nltk.word_tokenize(sent):
-            if (len(word) >= min_characters_word) & (word not in stop_words): 
+            if (len(word) >= x): 
                 tokens.append(word)
 
     return tokens

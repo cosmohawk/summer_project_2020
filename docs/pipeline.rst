@@ -1,19 +1,10 @@
 The Data Pipeline
 =================
 
-Data Collection
----------------
+.. include:: data_collection.rst
 
-Webscraping Journalist Twitter handles
+.. include:: graph_database.rst
 
-Requesting user profiles
+.. include:: statistical_analysis.rst
 
-Scraping friend lists
-
-Requesting user tweets
-
-
-Inputting data to the Graph Database
-------------------------------------
-
-py2neo funtions
+.. include:: topic_modelling.rst
