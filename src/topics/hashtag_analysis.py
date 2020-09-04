@@ -167,3 +167,51 @@ def label_data_by_topic(topic_space, threshold):
     labels = pd.DataFrame(label_series.apply(lambda x: x[0] if len(x)>0 else np.nan), columns=['labels',])
     
     return labels
+
+def check_for_matches(tag_list, topic_list, number_other_topic):
+    '''
+    Compares a list of hashtags in tweets against those in each topic.
+    
+    Parameters
+    ----------
+    tag_list : Pandas DataFrame column
+        A column containing hashtags
+    topic_list : list of lists
+        Each list in the list contains hashtags belonging to one topic.
+    number_other_topic : interger
+        The number to declare the 'other' topic, for example, -1, or one plus the number of topics
+        
+    Returns
+    -------
+    matches : Pandas series
+        Series of a numbers, where the number corresponds to which topic the hastags fall into
+    '''
+    
+    matches = []
+    
+    potential_matches = [bool(set(tag_list).intersection(set(topic))) for topic in topic_list]
+    if any(potential_matches):
+        matches.extend([i for i in range(len(potential_matches)) if potential_matches[i]])
+    else:
+        matches.append(number_other_topic)
+    return matches
+
+def check_keyword_matches(text, topic_list):
+    '''
+    Compares a list of 'keywords' in tweets.
+    
+    Parameters
+    ----------
+    text : Pandas dataframe column 
+        containing the text that the keywords search is to be performed on
+    topic_list : a list
+        a list of topics
+            
+    Returns
+    -------
+    matches : Pandas series
+        Series of a numbers, where the number corresponds to which topic the keywords fall into
+    '''
+    words = text.split(' ')
+    matches = [word for word in words if word in topic_list]
+    return matches
