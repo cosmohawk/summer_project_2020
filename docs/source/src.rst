@@ -9,9 +9,20 @@ Subpackages
 
    src.data
    src.features
+   src.graph_database
    src.models
    src.topics
-   src.visualization
+
+Submodules
+----------
+
+src.plots module
+----------------
+
+.. automodule:: src.plots
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

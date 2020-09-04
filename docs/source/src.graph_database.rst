@@ -1,13 +1,13 @@
-src.visualization package
-=========================
+src.graph\_database package
+===========================
 
 Submodules
 ----------
 
-src.visualization.visualize module
+src.graph\_database.graphdb module
 ----------------------------------
 
-.. automodule:: src.visualization.visualize
+.. automodule:: src.graph_database.graphdb
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ src.visualization.visualize module
 Module contents
 ---------------
 
-.. automodule:: src.visualization
+.. automodule:: src.graph_database
    :members:
    :undoc-members:
    :show-inheritance:

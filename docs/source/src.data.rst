@@ -4,6 +4,14 @@ src.data package
 Submodules
 ----------
 
+src.data.H\_Index\_tools module
+-------------------------------
+
+.. automodule:: src.data.H_Index_tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 src.data.api\_tweepy module
 ---------------------------
 
@@ -32,6 +40,14 @@ src.data.data\_cleanup module
 -----------------------------
 
 .. automodule:: src.data.data_cleanup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.data.graphdb module
+-----------------------
+
+.. automodule:: src.data.graphdb
    :members:
    :undoc-members:
    :show-inheritance:
