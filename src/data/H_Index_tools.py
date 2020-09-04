@@ -59,48 +59,13 @@ def loop_csv_H_index(src_dir, dest_dir, keyword):
 		df = pd.read_csv(os.path.join(src_dir, file), low_memory=False)
 		df_no_rt = df.rt_id.isnull()
 		df_like_count = pd.concat([df_like_count,df[df_no_rt].groupby('screen_name')[['retweet_count', 'like_count']].sum()])
-		df['retweets&likes'] = df[df_no_rt]['retweet_count'] + df[df_no_rt]['like_count']
+		df['retweets_likes'] = df[df_no_rt]['retweet_count'] + df[df_no_rt]['like_count']
 		for user_name in list(df['screen_name'].unique()):
-			like_list = list(df[df['screen_name']==user_name]['retweets&likes'].values)
+			like_list = list(df[df['screen_name']==user_name]['retweets_likes'].values)
 			h= hindex(like_list)
 			hdict[user_name]=h
 	hdict = {k: v for k, v in sorted(hdict.items(), key=lambda item: item[1], reverse=True)}
-	hdict_df = pd.DataFrame(hdict.items(), columns = ['screen_name', 'h-index_like&retweets'])
+	hdict_df = pd.DataFrame(hdict.items(), columns = ['screen_name', 'h_index_like_retweets'])
 	hdict_df.to_csv(os.path.join(dest_dir, keyword + '_h_index_users.csv'), index=False)
 	df_like_count.index.name = 'screen_name'
 	df_like_count.to_csv(os.path.join(dest_dir, keyword + '_like_rt_count_users.csv'), index=True)
-	#return hdict_df
-	#return df_like_count#hdict_df.to_csv(os.path.join(dest_dir, keyword + '_h_index_users.csv'), index=False)
-
-def plot_H_index(df):
-	'''
-	
-
-	Parameters
-	------
-	
-
-	Returns
-	-------
-	
-	'''
-	import seaborn as sns
-	import matplotlib.pyplot as plt
-	sns.set(font_scale=2) 
-	f = plt.figure(figsize=(20, 25))
-	gs = f.add_gridspec(2, 1)
-	ax = f.add_subplot(gs[0, 0])
-	sns.distplot(df['h-index_like&retweets'], kde=False, rug=False);
-	ax.set_xlabel('H-Index (like&retweets)', fontsize=50)
-	ax.set_ylabel('N of users', fontsize=50)
-
-	ax = f.add_subplot(gs[1, 0])
-	sns.scatterplot(df['user_friends_n'],df['user_followers_n'], 
-					size = df['h-index_like&retweets'],hue =df['h-index_like&retweets'],  
-					alpha=0.4, sizes=(20, 200))
-	ax.set_xlabel('Number of Friends', fontsize=50)
-	ax.set_ylabel('Number of Followers', fontsize=50)
-	ax.set_xscale('log')
-	ax.set_yscale('log')
-	ax.set_ylim(1, max(df['user_followers_n'])+1000000000)
-	ax.set_xlim(0.5)

@@ -137,7 +137,9 @@ def plot_tsne_projection(df, label_str, plotly=False, kwargs={}):
 
 def plot_H_index(df):
     '''
-    Plot the distribution of h-indices for a set of users.
+    Function that produces two subplots to visualise H-Index results:
+    Subplot 1: Distribution of H-Index. The range of x axis depends on the number of tweets dowloaded for each user
+    Subplot 2: Correlation between n. of followers and n. of friends with the H-Index represented by different point size and color
 
     Parameters
     ------
@@ -154,12 +156,12 @@ def plot_H_index(df):
     fig = plt.figure(figsize=(20, 25))
     gs = fig.add_gridspec(2, 1)
     ax = fig.add_subplot(gs[0, 0])
-    sns.distplot(df['h-index_like&retweets'], kde=False, rug=False)
+    sns.distplot(df['h_index_like_retweets'], kde=False, rug=False)
     ax.set_xlabel('H-Index (like&retweets)', fontsize=50)
     ax.set_ylabel('N of users', fontsize=50)
     ax = fig.add_subplot(gs[1, 0])
     sns.scatterplot(df['user_friends_n'],df['user_followers_n'],
-                     size = df['h-index_like&retweets'],hue =df['h-index_like&retweets'],
+                     size = df['h_index_like_retweets'],hue =df['h_index_like_retweets'],
                      alpha=0.4, sizes=(20, 200))
     ax.set_xlabel('Number of Friends', fontsize=50)
     ax.set_ylabel('Number of Followers', fontsize=50)
