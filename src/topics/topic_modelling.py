@@ -1,3 +1,5 @@
+import re
+
 def vec_for_learning(model, tagged_docs):
     '''
     Building the final vector feature for the classifier
