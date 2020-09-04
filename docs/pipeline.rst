@@ -5,6 +5,6 @@ The Data Pipeline
 
 .. include:: graph_database.rst
 
-.. include:: topic_modelling.rst
-
 .. include:: statistical_analysis.rst
+
+.. include:: topic_modelling.rst

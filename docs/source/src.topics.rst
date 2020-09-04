@@ -20,6 +20,14 @@ src.topics.preprocessing module
    :undoc-members:
    :show-inheritance:
 
+src.topics.topic\_modelling module
+----------------------------------
+
+.. automodule:: src.topics.topic_modelling
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
