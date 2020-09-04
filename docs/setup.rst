@@ -40,6 +40,7 @@ The primary module dependencies of this project are:
 * spacy
 * beautifulsoup
 * sklearn
+* wordcloud
 * wikipedia
 * Sphinx
 * sphinx_rtd_theme
