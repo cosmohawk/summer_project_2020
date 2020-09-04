@@ -1,0 +1,41 @@
+The Data Pipeline
+=================
+
+Data Collection
+---------------
+
+Webscraping Journalist Twitter handles
+
+Requesting user profiles
+
+Scraping friend lists
+
+Requesting user tweets
+
+
+Inputting data to the Graph Database
+------------------------------------
+
+A graph database is a database that uses graph structures for semantic queries with nodes, edges, and properties to represent and store data. The nodes represent the data items and the edges represent the relationships between them. These relationships can be directional. Graph databases are a type of NoSQL database, created to address the limitations of relational databases.
+
+A comparison can be made between the structure of a graph database and the English language. Nodes are like nouns, they can have certain qualities (adjectives). Edges are like verbs, they can also have certain qualities (adverbs).
+
+Before running this notebook one needs to have the Neo4j desktop development environment up and running. The Neo4j development app can be downloaded from here:
+
+https://neo4j.com/download/?ref=try-neo4j-lp
+
+There is also and online "sandbox" version, this is actually quite useful because it contains an example of twitter analytics. Neo4j can also be run from a cypher terminal, which comes with the desktop installation. We need to install the APOC and Graph Data Science Library plugins. These can be done via the desktop app.
+
+On the desktop, create a new database by clicking "add database" and selecting "create local database". We shall name our databse "Cyber Journalists" and give it the password "tweetoftheday". Then click "create", then "start", a new window will open.
+
+If your installation is anything like mine this will create a database in an obscure location on your computer.
+
+Later we will want to be able to read in and write to different file formats. To do this we need to locate the configuration file and add the following couple of lines to location/conf/neo4j.conf
+
+# Enable loading of json files                                                                                                                                                                  
+apoc.import.file.enabled=true
+
+# Enable exportation of files                                                                                                                                                                   
+apoc.export.file.enabled=true
+
+We will run the Page rank algorithm to measure the centrality of users and the Lauvain algorithm to look for communities within the graph. These algorithms are part of the Graph Data Science plugin that we installed earlier. If the plugins are not installed for this graph then you will need to install them and restart the graph.

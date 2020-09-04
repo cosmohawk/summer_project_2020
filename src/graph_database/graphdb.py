@@ -450,6 +450,8 @@ def boost_graph(niter,nsample,fields,exponents,pagerank_params,keyword,kwargs):
     if they are following other people already in the graph then follower edges are drawn in
     new users are not added to the graph.
 
+    Attempting to find all the friends of friends may result in downloading hundreds of thousands or millions of profiles. The network gets exponentially bigger at each level of abstraction. We can avoid this by selecting a random sample of users in our database and seeing if they are following anyone else in our database. We can weight this random selection by, for example, their previously determined rank or the number of friends or followers they have. By repeating this process several times we can build complexity into our graph.
+
     Parameters
     --------
     niter : int
@@ -492,7 +494,7 @@ def boost_graph(niter,nsample,fields,exponents,pagerank_params,keyword,kwargs):
         tt.twint_in_queue(tt._get_friends, 3, list(sample['screen_name']), args=('../data/raw/'+keyword+'_',), kwargs=kwargs)
 
         # concatinate the individual files into one file
-        friends_csv = tt.join_friends_csv(list(sample['screen name']),keyword) 
+        friends_csv = tt.join_friends_csv(list(sample['screen_name']),keyword) 
         friends_csv.to_csv('../data/processed/'+keyword+'_journalist_friends_of_friends_'+str(i)+'.csv', index=False)
 
         # load new follower edges into the network, only include edges between existing members.
@@ -614,3 +616,40 @@ def get_chi2_H_index(df):
     no_loners['chi2'] = no_loners.apply(lambda x: chi2(x['h_index_like_retweets']),axis=1)
     
     return no_loners.copy()
+
+def order_conversations(graph):
+    '''
+    Depending on the source of data (the Twitter API or twint) tweets either contain a "conversation_id" or a "reply_to_status_id". These are different but related numbers. The "conversation_id" is the id of the first tweet in the conversation, the "reply_to_status_id" is the id of the tweet in the conversation preceding the current tweet. Tweets also contain timestamp information, thus even if we don't have the "reply_to_status_id" we can order tweets in the conversation.
+
+    Parameters
+    -------
+    graph : graph
+
+    Returns
+    -------
+    Void
+    '''
+
+    # start by finding tweets in the same conversation by matching conversation_id
+    query_string = '''// Find tweets in the same conversation
+            MATCH (t1:Tweet), (t2:Tweet)
+            WHERE t1.conversation_id = t2.conversation_id
+            AND t1.tweet_id <> t2.tweet_id
+            AND t1.tweet_created_at_date <= t2.tweet_created_at_date
+            AND t1.tweet_created_at_time < t2.tweet_created_at_time
+            MERGE (t1)-[:CONVERSATION]->(t2)'''
+    graph.run(query_string)
+
+    # conversations should be a chain rather than a mesh, although very occasionally tweets may have the same time stamp
+    query_string = '''// Find the direction of the conversation
+            MATCH (t1)-[c1:CONVERSATION]->(t2), (t1)-[c2:CONVERSATION]->(t3) 
+            WHERE t2.tweet_created_at_date < t3.tweet_created_at_date
+            DELETE c2;'''
+    graph.run(query_string)
+
+    query_string = '''MATCH (t1)-[c1:CONVERSATION]->(t2), (t1)-[c2:CONVERSATION]->(t3) 
+            WHERE t2.tweet_created_at_time < t3.tweet_created_at_time
+            DELETE c2;'''
+    graph.run(query_string)
+
+    return
