@@ -50,8 +50,9 @@ def load_tweets(filename, graph):
        CREATE (t:Tweet {tweet_id: row.tweet_id, conversation_id: row.conversation_id, user_id: row.user_id, 
        reply_to: row.reply_to, tweet_created_at_date: row.tweet_created_at_date, 
        tweet_created_at_time: row.tweet_created_at_time, text: row.text, replies_count: row.replies_count, 
-       retweets_count: row.reteets_count, favourite_count: row.favourite_count, likes_count: row.likes_count,
-       hashtags: row.hashtags, topics: row.topics});
+       retweets_count: row.reteets_count, favourite_count: row.favourite_count, like_count: row.like_count,
+       hashtags: row.hashtags, topics: row.topics, in_reply_to_screen_name: row.in_reply_to_screen_name, 
+       in_reply_to_status_id: row.in_reply_to_status_id, rt_id: row.rt_id, quoted_status: row.quoted_status, quoted_status_id: row.quoted_status_id});
        '''
     # run cypher query
     graph.run(query_string)
@@ -253,7 +254,7 @@ def run_pagerank(nodelist,edgelist,graph,new_native_graph=True):
     ans = graph.run(query_string)
     
     # put result into a dataframe
-    df = pd.DataFrame.from_records(ans, columns=['screen name', 'rank', 'n_followers'])
+    df = pd.DataFrame.from_records(ans, columns=['screen_name', 'rank', 'n_followers'])
     
     return df.copy()
 
@@ -488,7 +489,7 @@ def boost_graph(niter,nsample,fields,exponents,pagerank_params,keyword,kwargs):
         sample = get_multiple_weighted_sample(page_rank,nsample,fields,exponents)
 
         # use twint to get friend information for members of the sample and write a file for each user
-        tt.twint_in_queue(tt._get_friends, 3, list(sample['screen name']), args=('../data/raw/'+keyword+'_',), kwargs=kwargs)
+        tt.twint_in_queue(tt._get_friends, 3, list(sample['screen_name']), args=('../data/raw/'+keyword+'_',), kwargs=kwargs)
 
         # concatinate the individual files into one file
         friends_csv = tt.join_friends_csv(list(sample['screen name']),keyword) 
@@ -554,7 +555,7 @@ def filter_by_topic(keyword,graph):
         RETURN p.screen_name'''
     ans = graph.run(query_string)
 
-    names = pd.DataFrame.from_records(ans,columns=['screen name'])
+    names = pd.DataFrame.from_records(ans,columns=['screen_name'])
     
     return names
 
@@ -585,3 +586,31 @@ def add_property(property_name,dataframe,graph):
         graph.run(query_string)
     return
     
+def get_chi2_H_index(df):
+    '''
+    Routine to calculate the chi2 of each user based on the H index
+    
+    Parameters
+    -------
+    df : pandas dataframe
+        Dataframe containing le H-index of users
+        
+    Returns
+    -------
+    no_loners : pandas dataframe
+        Dataframe with added column representing the chi2 of users.
+        Users with an H-index of zero are excised from the dataframe.
+        
+    '''
+    no_loners = df[df['h_index_like_retweets'] != 0].copy()
+    xvals = np.log(no_loners['h_index_like_retweets'])
+    var = np.var(xvals)
+    xbar = np.mean(xvals)
+    def chi2(x):
+        dx = np.log(x) - xbar
+        chi2 = dx**2/var
+        return chi2
+    
+    no_loners['chi2'] = no_loners.apply(lambda x: chi2(x['h_index_like_retweets']),axis=1)
+    
+    return no_loners.copy()
