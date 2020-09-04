@@ -214,7 +214,7 @@ def run_pagerank(nodelist,edgelist,graph,new_native_graph=True):
 
     new_native_graph : boolean
         If True makes a new native projection of the graph
-        If False uses the existing projection
+        If False uses the existing projection.
 
     Returns
     -------
