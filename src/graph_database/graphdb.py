@@ -281,12 +281,12 @@ def get_weighted_sample(ranked_df,sample_size,field,weight_exponent=2):
     
     '''
     sum_of_ranks = np.sum(ranked_df[field]**weight_exponent)
-    sample = np.random.choice(ranked_df['screen name'],size=sample_size,
+    sample = np.random.choice(ranked_df['screen_name'],size=sample_size,
                               replace=False,p=ranked_df[field]**weight_exponent/sum_of_ranks)
 
     lst = []
     for s in sample:
-        index = ranked_df.index[ranked_df['screen name'] == s].tolist()
+        index = ranked_df.index[ranked_df['screen_name'] == s].tolist()
         lst.append(index[0])     
     sample_df = ranked_df.loc[lst].copy()
 
@@ -305,12 +305,12 @@ def get_multiple_weighted_sample(ranked_df,sample_size,fields,weight_exponents):
         weights.append(weight)
 
     weights = np.prod(weights,axis=0)/np.sum(np.prod(weights,axis=0))
-    sample = np.random.choice(ranked_df['screen name'],size=sample_size,
+    sample = np.random.choice(ranked_df['screen_name'],size=sample_size,
                                     replace=False,p=weights)
      
     lst = []
     for s in sample:
-        index  = ranked_df.index[ranked_df['screen name'] == s].tolist()
+        index  = ranked_df.index[ranked_df['screen_name'] == s].tolist()
         lst.append(index[0])
     sample_df = ranked_df.loc[lst].copy()
     return sample_df
